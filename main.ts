@@ -1,5 +1,7 @@
 
-import { config } from './deps.ts';  config,
+import {
+  config,
+  clubs,
   Application,
   Router,
   send
@@ -8,8 +10,9 @@ import { config } from './deps.ts';  config,
 const app = new Application();
 const router = new Router();
 router
-  .get('/api', (ctx) => {
-    ctx.response.body = 'Hello World!';
+  .get('/club/:id', (ctx) => {
+    ctx.response.headers.set('Content-Type', 'application/json');
+    ctx.response.body = clubs.find(c => c.id === ctx.params.id);
   });
 
 app.use(router.routes());
