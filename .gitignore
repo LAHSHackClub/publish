@@ -1,0 +1,6 @@
+
+# editor
+.vscode/*
+
+# environments
+/environment/environment.dev.ts
