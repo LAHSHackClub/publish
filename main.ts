@@ -10,9 +10,18 @@ import {
 const app = new Application();
 const router = new Router();
 router
-  .get('/club/:id', (ctx) => {
+  .get('/club/:id', ctx => {
     ctx.response.headers.set('Content-Type', 'application/json');
     ctx.response.body = clubs.find(c => c.id === ctx.params.id);
+  })
+  .post('/club/:id', ctx => {
+    const club = clubs.find(c => c.id === ctx.params.id);
+    if (!club) {
+      ctx.response.status = 404;
+      ctx.response.body = { error: 'Club not found' };
+      return;
+    }
+    ctx.response.status = 204;
   });
 
 app.use(router.routes());
