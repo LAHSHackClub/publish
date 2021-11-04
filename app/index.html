@@ -24,19 +24,35 @@
         font-size: 1.5rem;
         transition-duration: 0.3s;
       }
-      button:hover {
+      button:not([disabled]):hover {
         background: orange;
         color: white;
       }
+      button[disabled]:hover {
+        border-color: red;
+      }
     </style>
     <script>
-
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const club = await fetch(`/club/${params.get("club")}`);
+          document.querySelector("#club").innerHTML = (await club.json()).name;
+          document.querySelector("#publish").removeAttribute("disabled");
+        }
+        catch (e) {
+          console.error(e);
+        }
+      });
+      function publish() {
+        document.querySelector("#club").innerHTML = "Publishing...";
+      }
     </script>
   </head>
   <body>
     <main>
-      <h1>this club: <span id="club"><code>error</code></span></h1>
-      <button>Publish Site</button>
+      <h1><span id="club"><code>error</code></span></h1>
+      <button id="publish" onclick="publish()" disabled>Publish Site</button>
       <br><br>
       <p>powered by <b>LAHS GET</b></p>
     </main>
