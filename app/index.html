@@ -33,25 +33,40 @@
       }
     </style>
     <script>
+      let club;
+      let lastPublish;
       document.addEventListener("DOMContentLoaded", async () => {
         try {
-          const params = new URLSearchParams(window.location.search);
-          const club = await fetch(`/club/${params.get("club")}`);
-          document.querySelector("#club").innerHTML = (await club.json()).name;
+          const clubId = new URLSearchParams(window.location.search).get("club");
+          if (!clubId) throw new Error("No club ID provided");
+          club = await (await fetch(`/club/${clubId}`)).json();
+
+          document.querySelector("#club").innerHTML = club.name;
+          document.querySelector("#status").href = `https://${club.short}.lahs.club`;
+          document.querySelector("#status").innerHTML = `${club.short}.lahs.club`;
           document.querySelector("#publish").removeAttribute("disabled");
         }
         catch (e) {
           console.error(e);
         }
       });
-      function publish() {
-        document.querySelector("#club").innerHTML = "Publishing...";
+      async function publish() {
+        try {
+          const res = await fetch(`/club/${club.id}`, { method: "POST" });
+          document.querySelector("#status").innerHTML = new Date().toLocaleString();
+        }
+        catch (e) {
+          document.querySelector("#status").innerHTML = "error "+e;
+          console.error(e);
+        }
       }
     </script>
   </head>
   <body>
     <main>
       <h1><span id="club"><code>error</code></span></h1>
+      <p>published <a id="status" target="_blank"></a></p>
+      <br>
       <button id="publish" onclick="publish()" disabled>Publish Site</button>
       <br><br>
       <p>powered by <b>LAHS GET</b></p>
