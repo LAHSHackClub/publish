@@ -1,11 +1,11 @@
 
 import {
-  config,
   clubs,
   Application,
   Router,
   send
 } from './deps.ts';
+import { queryDatabase } from './services/notion.ts';
 
 const app = new Application();
 const router = new Router();
@@ -14,12 +14,15 @@ router
     ctx.response.headers.set('Content-Type', 'application/json');
     ctx.response.body = clubs.find(c => c.id === ctx.params.id);
   })
-  .post('/club/:id', ctx => {
+  .post('/club/:id', async ctx => {
     const club = clubs.find(c => c.id === ctx.params.id);
     if (!club) {
       ctx.response.status = 404;
       ctx.response.body = { error: 'Club not found' };
       return;
+    }
+    for (const dbId in club.databases) {
+      const res = await queryDatabase(dbId);
     }
     ctx.response.status = 204;
   });
