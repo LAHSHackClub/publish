@@ -21,8 +21,9 @@ router
       ctx.response.body = { error: 'Club not found' };
       return;
     }
-    for (const dbId in club.databases) {
+    for (const dbId of club.databases) {
       const res = await queryDatabase(dbId);
+      console.log(res);
     }
     ctx.response.status = 204;
   });
