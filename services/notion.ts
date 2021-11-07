@@ -8,6 +8,9 @@ const baseOpts = {
 };
 
 export async function queryDatabase(dbId: string, cursor?: string): Promise<PaginationResult<Page>> {
-  const res = await fetch(`${baseUrl}/databases/${dbId}/query`, { ...baseOpts, method: 'POST' });
-  return await res.json();
+  const body = { start_cursor: cursor, page_size: 100 };
+  const res = await fetch(`${baseUrl}/databases/${dbId}/query`,
+    { ...baseOpts, method: 'POST', body: JSON.stringify(body)})
+    .then(res => res.json() as unknown as PaginationResult<Page>);
+  return res;
 }
