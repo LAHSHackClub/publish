@@ -4,3 +4,7 @@
 
 # environments
 /environment/environment.dev.ts
+
+# app
+/app/content/*
+/app/cache/*
