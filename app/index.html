@@ -13,13 +13,21 @@
         display: grid;
         place-items: center;
         font-family: 'Poppins', sans-serif;
-        text-align: center;
+      }
+      main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        column-gap: 30px;
+        width: 100%;
       }
       button {
         background: none;
         border: 5px solid orange;
         border-radius: 10px;
-        padding: 30px 50px;
+        margin: 10px 0;
+        padding: 20px 50px;
         font-family: inherit;
         font-size: 1.5rem;
         transition-duration: 0.3s;
@@ -30,6 +38,13 @@
       }
       button[disabled]:hover {
         border-color: red;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin: 0;
+      }
+      p {
+        margin: 0;
       }
     </style>
     <script>
@@ -64,12 +79,12 @@
   </head>
   <body>
     <main>
-      <h1><span id="club"><code>error</code></span></h1>
-      <p>published <a id="status" target="_blank"></a></p>
-      <br>
+      <div>
+        <h1><span id="club"><code>error</code></span></h1>
+        <p>published <a id="status" target="_blank"></a></p>
+        <p>powered by <b>LAHS GET</b></p>
+      </div>
       <button id="publish" onclick="publish()" disabled>Publish Site</button>
-      <br><br>
-      <p>powered by <b>LAHS GET</b></p>
     </main>
   </body>
 </html>
