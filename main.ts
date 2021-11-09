@@ -22,8 +22,24 @@ router
       return;
     }
     for (const dbId of club.databases) {
+      // Query database and cache result (raw data)
       const res = await queryDatabase(dbId);
-      console.log(res);
+      await Deno.mkdir(`./app/cache`, { recursive: true });
+      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(res));
+
+      // Cache first attached file per result
+      for (const result of res.results) {
+        for (const key of Object.keys(result.properties)) {
+          const value = result.properties[key];
+          if (value.type === 'files') {
+            // Download file and save to usercontent folder
+            const url = value.files[0].file.url;
+            const f = await(await fetch(url)).arrayBuffer();
+            await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
+            await Deno.writeFile(`./app/content/${dbId}/${value.files[0].name}`, new Uint8Array(f));
+          }
+        }
+      }
     }
     ctx.response.status = 204;
   });
