@@ -22,14 +22,12 @@ router
       ctx.response.body = { error: 'Club not found' };
       return;
     }
+
     for (const dbId of club.databases) {
       // Query Notion database with ID
       const res = await queryDatabase(dbId);
       // Flatten the response
       const flat = flatten(res);
-      // Cache and save the flat response
-      await Deno.mkdir(`./app/cache`, { recursive: true });
-      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
 
       // Cache first attached file per result
       for (const page of flat) {
@@ -39,10 +37,17 @@ router
             const f = await(await fetch(page[key].url)).arrayBuffer();
             await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
             await Deno.writeFile(`./app/content/${dbId}/${page[key].name}`, new Uint8Array(f));
+            // Update URL with new path
+            page[key].url = `https://db.lahs.club/content/${dbId}/${page[key].name}`;
           }
         }
       }
+
+      // Cache and save the flat response with updated URLs
+      await Deno.mkdir(`./app/cache`, { recursive: true });
+      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
     }
+    
     ctx.response.status = 204;
   });
 
