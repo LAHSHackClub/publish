@@ -5,6 +5,7 @@ import {
   Router,
   send
 } from './deps.ts';
+import { flatten } from "./services/flatten.ts";
 import { queryDatabase } from './services/notion.ts';
 
 const app = new Application();
@@ -22,21 +23,22 @@ router
       return;
     }
     for (const dbId of club.databases) {
-      // Query database and cache result (raw data)
+      // Query Notion database with ID
       const res = await queryDatabase(dbId);
+      // Flatten the response
+      const flat = flatten(res);
+      // Cache and save the flat response
       await Deno.mkdir(`./app/cache`, { recursive: true });
-      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(res));
+      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
 
       // Cache first attached file per result
-      for (const result of res.results) {
-        for (const key of Object.keys(result.properties)) {
-          const value = result.properties[key];
-          if (value.type === 'files') {
+      for (const page of flat) {
+        for (const key of Object.keys(page)) {
+          if (page[key].type === 'files') {
             // Download file and save to usercontent folder
-            const url = value.files[0].file.url;
-            const f = await(await fetch(url)).arrayBuffer();
+            const f = await(await fetch(page[key].url)).arrayBuffer();
             await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
-            await Deno.writeFile(`./app/content/${dbId}/${value.files[0].name}`, new Uint8Array(f));
+            await Deno.writeFile(`./app/content/${dbId}/${page[key].name}`, new Uint8Array(f));
           }
         }
       }
