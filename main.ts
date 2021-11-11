@@ -48,6 +48,7 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.use(async (ctx) => {
+  ctx.response.headers.set('Access-Control-Allow-Origin', '*');
   await send(ctx, ctx.request.url.pathname, {
     root: `${Deno.cwd()}/app`,
     index: 'index.html',
