@@ -6,7 +6,7 @@ import {
   send
 } from './deps.ts';
 import { flatten } from "./services/flatten.ts";
-import { queryDatabase } from './services/notion.ts';
+import { getDatabase, queryDatabase } from './services/notion.ts';
 
 const app = new Application();
 const router = new Router();
@@ -25,6 +25,14 @@ router
 
     for (const dbId of club.databases) {
       // Query Notion database with ID
+      const db = await getDatabase(dbId);
+      try {
+        const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
+        if (db.last_edited_time === metaDb.last_edited_time) {
+          console.log(`[LOG] ${club.short}:${dbId} is up to date`);
+          continue;
+        }
+      }
       const res = await queryDatabase(dbId);
       // Flatten the response
       const flat = flatten(res);
@@ -45,6 +53,7 @@ router
 
       // Cache and save the flat response with updated URLs
       await Deno.mkdir(`./app/cache`, { recursive: true });
+      await Deno.writeTextFile(`./app/meta/${dbId}.json`, JSON.stringify(db));
       await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
     }
     
@@ -63,4 +72,3 @@ app.use(async (ctx) => {
 })
 
 await app.listen({ port: 8000 });
-
