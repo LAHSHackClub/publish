@@ -49,16 +49,18 @@ router
       const res = await queryDatabase(dbId);
       const flat = flatten(res);
 
-      // Cache first attached file per result
+      // Cache attached files
       for (const page of flat) {
         for (const key of Object.keys(page)) {
+          if (!page[key]?.url) continue;
           if (page[key].type === 'files') {
-            // Download file and save to usercontent folder
-            const f = await(await fetch(page[key].url)).arrayBuffer();
-            await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
-            await Deno.writeFile(`./app/content/${dbId}/${page[key].name}`, new Uint8Array(f));
-            // Update URL with new path
-            page[key].url = `https://db.lahs.club/content/${dbId}/${page[key].name}`;
+            for (const item of page[key]) {
+              // Download file and save to usercontent folder
+              const f = await(await fetch(item.url)).arrayBuffer();
+              await Deno.writeFile(`./app/content/${dbId}/${item.name}`, new Uint8Array(f));
+              // Update URL with new path
+              item.url = `https://db.lahs.club/content/${dbId}/${item.name}`;
+            }
           }
         }
       }
