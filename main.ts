@@ -35,6 +35,7 @@ router
     console.log(`[EVT] Publishing ${club.name} at ${new Date().toUTCString()}`);
 
     for (const dbId of club.databases) {
+      // Perform metadata check to see if DB needs to be updated
       const db = await getDatabase(dbId);
       try {
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
@@ -49,18 +50,16 @@ router
       const res = await queryDatabase(dbId);
       const flat = flatten(res);
 
-      // Cache attached files
+      // Find properties with files and cache them
       for (const page of flat) {
-        for (const key of Object.keys(page)) {
-          if (!page[key]?.url) continue;
-          if (page[key].type === 'files') {
-            for (const item of page[key]) {
-              // Download file and save to usercontent folder
-              const f = await(await fetch(item.url)).arrayBuffer();
-              await Deno.writeFile(`./app/content/${dbId}/${item.name}`, new Uint8Array(f));
-              // Update URL with new path
-              item.url = `https://db.lahs.club/content/${dbId}/${item.name}`;
-            }
+        const keys = Object.keys(page).filter(key => page[key]?.type === 'files');
+        for (const key of keys) {
+          for (const item of page[key]) {
+            // Download file and save to usercontent folder
+            const f = await(await fetch(item.url)).arrayBuffer();
+            await Deno.writeFile(`./app/content/${dbId}/${item.name}`, new Uint8Array(f));
+            // Update URL with new path
+            item.url = `https://db.lahs.club/content/${dbId}/${item.name}`;
           }
         }
       }
@@ -70,6 +69,7 @@ router
       await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
     }
     
+    console.log(`[EVT] Finished publishing ${club.name} at ${new Date().toUTCString()}`);
     ctx.response.status = 204;
   });
 
