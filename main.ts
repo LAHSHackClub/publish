@@ -1,11 +1,11 @@
 
 import {
   clubs,
-  nanoid,
   Application,
   Router,
   send
 } from './deps.ts';
+import { cachePages } from './services/cache.ts';
 import { flatten } from './services/flatten.ts';
 import { getDatabase, queryDatabase } from './services/notion.ts';
 
@@ -53,19 +53,7 @@ router
       await Deno.remove(`./app/content/${dbId}`, { recursive: true });
       await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
       // Find properties with files and cache them
-      for (const page of pages) {
-        const keys = Object.keys(page).filter(key => page[key]?.type === 'files');
-        for (const key of keys) {
-          for (const item of page[key]) {
-            // Download file, generate new UUID and save locally
-            const f = await(await fetch(item.url)).arrayBuffer();
-            const uuid = `${nanoid()}-${item.name}`;
-            await Deno.writeFile(`./app/content/${dbId}/${uuid}`, new Uint8Array(f));
-            // Update URL with new path
-            item.url = `https://db.lahs.club/content/${dbId}/${uuid}`;
-          }
-        }
-      }
+      await cachePages(dbId, pages);
 
       // Cache and save the flat response with updated URLs
       await Deno.writeTextFile(`./app/meta/${dbId}.json`, JSON.stringify(db));
