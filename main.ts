@@ -1,11 +1,12 @@
 
 import {
   clubs,
+  nanoid,
   Application,
   Router,
   send
 } from './deps.ts';
-import { flatten } from "./services/flatten.ts";
+import { flatten } from './services/flatten.ts';
 import { getDatabase, queryDatabase } from './services/notion.ts';
 
 /* Startup - ensure needed directories exist */
@@ -53,11 +54,12 @@ router
         const keys = Object.keys(page).filter(key => page[key]?.type === 'files');
         for (const key of keys) {
           for (const item of page[key]) {
-            // Download file and save to usercontent folder
+            // Download file, generate new UUID and save locally
             const f = await(await fetch(item.url)).arrayBuffer();
-            await Deno.writeFile(`./app/content/${dbId}/${item.name}`, new Uint8Array(f));
+            const uuid = `${nanoid()}-${item.name}`;
+            await Deno.writeFile(`./app/content/${dbId}/${uuid}`, new Uint8Array(f));
             // Update URL with new path
-            item.url = `https://db.lahs.club/content/${dbId}/${item.name}`;
+            item.url = `https://db.lahs.club/content/${dbId}/${uuid}`;
           }
         }
       }
