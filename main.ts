@@ -12,6 +12,10 @@ import { getDatabase, queryDatabase } from './services/notion.ts';
 /* Startup - ensure needed directories exist */
 await Deno.mkdir(`./app/cache`, { recursive: true });
 await Deno.mkdir(`./app/meta`, { recursive: true });
+clubs.forEach(async club => {
+  club.databases.forEach(async (dbId: string) => {
+    await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
+  });});
 console.log(`[EVT] Completed setup at ${new Date().toUTCString()}`);
 
 /* Application logic */
