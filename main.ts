@@ -33,7 +33,7 @@ router
       ctx.response.body = { error: 'Club not found' };
       return;
     }
-    console.log(`[EVT] Publishing ${club.name} at ${new Date().toUTCString()}`);
+    console.log(`[EVT] Publishing ${club.short} at ${new Date().toUTCString()}`);
 
     for (const dbId of club.databases) {
       // Perform metadata check to see if DB needs to be updated
@@ -73,7 +73,7 @@ router
       await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(pages));
     }
     
-    console.log(`[EVT] Finished publishing ${club.name} at ${new Date().toUTCString()}`);
+    console.log(`[EVT] Finished publishing ${club.short} at ${new Date().toUTCString()}`);
     ctx.response.status = 204;
   });
 
