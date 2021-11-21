@@ -47,10 +47,14 @@ router
 
       // Query Notion database and flatten
       const res = await queryDatabase(dbId);
-      const flat = flatten(res);
+      let pages: any[] = flatten(res);
+      while (res.has_more) {
+        const next = await queryDatabase(dbId, res.next_cursor);
+        pages = pages.concat(pages, flatten(next));
+      }
 
       // Find properties with files and cache them
-      for (const page of flat) {
+      for (const page of pages) {
         const keys = Object.keys(page).filter(key => page[key]?.type === 'files');
         for (const key of keys) {
           for (const item of page[key]) {
@@ -66,7 +70,7 @@ router
 
       // Cache and save the flat response with updated URLs
       await Deno.writeTextFile(`./app/meta/${dbId}.json`, JSON.stringify(db));
-      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(flat));
+      await Deno.writeTextFile(`./app/cache/${dbId}.json`, JSON.stringify(pages));
     }
     
     console.log(`[EVT] Finished publishing ${club.name} at ${new Date().toUTCString()}`);
