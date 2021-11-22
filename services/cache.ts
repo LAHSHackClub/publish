@@ -27,25 +27,24 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
     for (const item of page[key]) {
       const fileId = nanoid();
       const fileName = `${fileId}${item.name}`;
-
-      // Download file, generate new UUID and save locally
-      const f = await(await fetch(item.url)).arrayBuffer();
-      await cacheFile(`/content/${dbId}/${fileName}`, new Uint8Array(f));
-      
-      // Create a smaller thumbnail
       try {
+        // Get file data
+        const f = await(await fetch(item.url)).arrayBuffer();
+
+        // Create a smaller thumbnail
         const img = await Image.decode(f);
-        const ico = await img.resize(600, Image.RESIZE_AUTO).encodeJPEG();
-        await cacheFile(`/icon/${dbId}/${fileId}.jpg`, ico);
+        img.resize(600, Image.RESIZE_AUTO).encodeJPEG()
+          .then(ico => cacheFile(`/icon/${dbId}/${fileId}.jpg`, ico));
         item.icon = `https://db.lahs.club/icon/${dbId}/${fileId}.jpg`;
+        // Update item with new paths
+        item.url = `https://db.lahs.club/content/${dbId}/${fileName}`;
+
+        // Save locally
+        await cacheFile(`/content/${dbId}/${fileName}`, new Uint8Array(f));
       }
       catch (e) {
-        console.log(`[LOG] ${dbId}:${fileId} is not a supported image`);
-        item.icon = `https://db.lahs.club/content/${dbId}/${fileName}`;
+        console.log(`[LOG] ${dbId}:${fileId} is not a supported image - skipping`);
       }
-
-      // Update item with new paths
-      item.url = `https://db.lahs.club/content/${dbId}/${fileName}`;
     }
   }
 }
