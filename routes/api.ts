@@ -26,7 +26,7 @@ apiRouter
       try {
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
         if (metaDb.properties["Modified"] === "last_edited_time")
-          updateFrom = new Date(metaDb.last_edited_time.after);
+          updateFrom = new Date(metaDb.last_edited_time);
         if (db.last_edited_time !== metaDb.last_edited_time)
           throw new Error();
         else console.log(`[LOG] ${club.short}:${dbId} is up to date`);
