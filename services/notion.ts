@@ -15,12 +15,7 @@ const baseOpts = {
 export async function queryDatabase(
     dbId: string, cursor?: string, after?: Date): Promise<PaginationResult> {
   // Database query options - pagination + filters
-  const body = {
-    start_cursor: cursor,
-    filter: after ? {
-      "property": "Modified",
-      "last_edited_time": { "after": after.toISOString() }
-    } : undefined };
+  const body = { start_cursor: cursor };
   // Make the query and return JSON response
   const res = await fetch(`${baseUrl}/databases/${dbId}/query`,
     { ...baseOpts, method: 'POST', body: JSON.stringify(body)});
