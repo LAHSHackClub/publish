@@ -25,14 +25,15 @@ apiRouter
       let updateFrom: Date | undefined;
       try {
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
-        if (metaDb.properties["Modified"] === "last_edited_time")
-          updateFrom = new Date(metaDb.last_edited_time);
+        //if (metaDb.properties["Modified"] === "last_edited_time")
+        //  updateFrom = new Date(metaDb.last_edited_time);
         if (db.last_edited_time !== metaDb.last_edited_time)
           throw new Error();
         else console.log(`[LOG] ${club.short}:${dbId} is up to date`);
         continue;
       } catch (e) {
-        console.log(`[LOG] Updating ${club.short}:${dbId} ${updateFrom ? `from ${updateFrom.toISOString()}` : ''}`);
+        const resumed = updateFrom ? `from ${updateFrom.toISOString()}` : '';
+        console.log(`[LOG] Updating ${club.short}:${dbId} ${resumed}`);
       }
 
       // Query Notion database and flatten
