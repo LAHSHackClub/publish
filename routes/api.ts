@@ -31,7 +31,7 @@ apiRouter
 
       // Query Notion database and flatten
       let res = await queryDatabase(dbId);
-      let pages: any[] = flattenResult(res);
+      let pages = flattenResult(res);
       while (res.next_cursor) {
         console.log(`[LOG] Querying ${club.short}:${dbId} for more pages`);
         res = await queryDatabase(dbId, res.next_cursor);

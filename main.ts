@@ -1,9 +1,5 @@
 
-import {
-  clubs,
-  Application,
-  send
-} from './deps.ts';
+import { clubs, Application, send } from './deps.ts';
 import { apiRouter } from './routes/api.ts';
 
 /* Startup - ensure needed directories exist */
@@ -18,7 +14,6 @@ console.log(`[EVT] Completed setup at ${new Date().toUTCString()}`);
 
 /* Application logic */
 const app = new Application();
-
 app.use(apiRouter.routes());
 app.use(apiRouter.allowedMethods());
 
