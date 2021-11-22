@@ -10,6 +10,25 @@ export function flattenResult(res: PaginationResult): Flattened[] {
   return res.results.map((page) => flatten(page));
 }
 
+// Flattens database meta information
+export function flattenDb(db: Flattenable): Flattened {
+  // Transpose properties to new object
+  const flat: Flattened = {
+    properties: db.properties,
+    id: db.id,
+    created_time: db.created_time,
+    last_edited_time: db.last_edited_time
+  };
+  // Flatten each individual property recursively
+  for (const key of Object.keys(db.properties))
+    flat.properties[key] = flattenProperty(db.properties[key]);
+  // Set properties to their type directly
+  for (const key of Object.keys(flat.properties))
+    flat.properties[key] = flat.properties[key].type;
+  // Return flattened object
+  return flat;
+}
+
 // Flattens an individual object's properties
 export function flatten(page: Flattenable): Flattened {
   // Transpose properties to new object

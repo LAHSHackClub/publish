@@ -16,6 +16,10 @@ export async function queryDatabase(
   // Database query options - pagination + filters
   const body = {
     start_cursor: cursor ?? undefined,
+    filter: after ? {
+      "property": "Modified",
+      "last_edited_time": { "after": after.toISOString() }
+    } : undefined
   };
   // Make the query and return JSON response
   const res = await fetch(`${baseUrl}/databases/${dbId}/query`,

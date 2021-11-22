@@ -1,7 +1,7 @@
 
 import { clubs, Router } from '../deps.ts';
 import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
-import { flattenResult } from '../services/flatten.ts';
+import { flattenDb, flattenResult } from '../services/flatten.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 
 export const apiRouter = new Router();
@@ -21,20 +21,24 @@ apiRouter
 
     for (const dbId of club.databases) {
       // Perform metadata check to see if DB needs to be updated
-      const db = await getDatabase(dbId);
+      const db = flattenDb(await getDatabase(dbId));
+      let updateFrom: Date | undefined;
       try {
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
-        if (db.last_edited_time !== metaDb.last_edited_time) throw new Error();
+        if (db.last_edited_time !== metaDb.last_edited_time) {
+          updateFrom = new Date(metaDb.last_edited_time);
+          throw new Error();
+        }
         else console.log(`[LOG] ${club.short}:${dbId} is up to date`);
         continue;
       } catch (e) { console.log(`[LOG] Updating ${club.short}:${dbId}`); }
 
       // Query Notion database and flatten
-      let res = await queryDatabase(dbId);
+      let res = await queryDatabase(dbId, undefined, updateFrom);
       let pages = flattenResult(res);
       while (res.next_cursor) {
         console.log(`[LOG] Querying ${club.short}:${dbId} for more pages`);
-        res = await queryDatabase(dbId, res.next_cursor);
+        res = await queryDatabase(dbId, res.next_cursor, updateFrom);
         pages.push(...flattenResult(res));
       }
 
