@@ -1,10 +1,10 @@
 
-export interface Page {
-  id: string
-  created_time: string
-  last_edited_time: string
-  parent: { type: string, database_id: string }
-  archived: boolean
-  properties: any
-  url: string
+import { BaseObject } from './base.ts';
+
+export interface Page extends BaseObject {
+  properties: { [key: string]: any }
+}
+
+export interface FlatPage extends BaseObject {
+  [key: string]: any
 }

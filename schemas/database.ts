@@ -1,6 +1,10 @@
 
-export interface Database {
-  id: string
-  created_time: string
-  last_edited_time: string
+import { BaseObject } from './base.ts';
+
+export interface Database extends BaseObject {
+  properties: { [key: string]: any }
+}
+
+export interface FlatDatabase extends BaseObject {
+  [key: string]: any
 }
