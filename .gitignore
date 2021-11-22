@@ -8,4 +8,5 @@
 # app
 /app/content/*
 /app/cache/*
+/app/icon/*
 /app/meta/*

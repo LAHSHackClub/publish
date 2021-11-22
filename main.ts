@@ -15,6 +15,7 @@ await Deno.mkdir(`./app/meta`, { recursive: true });
 clubs.forEach(async club => {
   club.databases.forEach(async (dbId: string) => {
     await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
+    await Deno.mkdir(`./app/icon/${dbId}`, { recursive: true });
   });});
 console.log(`[EVT] Completed setup at ${new Date().toUTCString()}`);
 
@@ -57,6 +58,8 @@ router
       // Remove existing cache and recreate dir (nanoid will invalidate old files)
       await Deno.remove(`./app/content/${dbId}`, { recursive: true });
       await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
+      await Deno.remove(`./app/icon/${dbId}`, { recursive: true });
+      await Deno.mkdir(`./app/icon/${dbId}`, { recursive: true });
       // Find properties with files and cache them
       await cachePages(dbId, pages);
 
@@ -75,10 +78,15 @@ app.use(router.allowedMethods());
 /* Static file serving (publish widget + usercontent) */
 app.use(async (ctx) => {
   ctx.response.headers.set('Access-Control-Allow-Origin', '*');
-  await send(ctx, ctx.request.url.pathname, {
-    root: `${Deno.cwd()}/app`,
-    index: 'index.html',
-  });
+  try {
+    await send(ctx, ctx.request.url.pathname, {
+      root: `${Deno.cwd()}/app`,
+      index: 'index.html',
+    });
+  } catch (e) {
+    console.log(`[ERR] ${e.name} - ${ctx.request.url}`);
+    ctx.response.status = 404;
+  }
 })
 
 console.log(`[EVT] Listening on :8000`);
