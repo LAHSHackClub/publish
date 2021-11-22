@@ -33,13 +33,19 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
       await cacheFile(`/content/${dbId}/${fileName}`, new Uint8Array(f));
       
       // Create a smaller thumbnail
-      const img = await Image.decode(f);
-      const ico = await img.resize(600, Image.RESIZE_AUTO).encodeJPEG();
-      await cacheFile(`/icon/${dbId}/${fileId}.jpg`, ico);
+      try {
+        const img = await Image.decode(f);
+        const ico = await img.resize(600, Image.RESIZE_AUTO).encodeJPEG();
+        await cacheFile(`/icon/${dbId}/${fileId}.jpg`, ico);
+        item.icon = `https://db.lahs.club/icon/${dbId}/${fileId}.jpg`;
+      }
+      catch (e) {
+        console.log(`[LOG] ${dbId}:${fileId} is not a supported image`);
+        item.icon = `https://db.lahs.club/content/${dbId}/${fileName}`;
+      }
 
       // Update item with new paths
       item.url = `https://db.lahs.club/content/${dbId}/${fileName}`;
-      item.icon = `https://db.lahs.club/icon/${dbId}/${fileId}.jpg`;
     }
   }
 }
