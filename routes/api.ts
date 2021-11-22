@@ -1,7 +1,7 @@
 
 import { clubs, Router } from '../deps.ts';
 import { cachePages } from '../services/cache.ts';
-import { flatten } from '../services/flatten.ts';
+import { flattenResult } from '../services/flatten.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 
 export const apiRouter = new Router();
@@ -31,11 +31,11 @@ apiRouter
 
       // Query Notion database and flatten
       let res = await queryDatabase(dbId);
-      let pages: any[] = flatten(res);
+      let pages: any[] = flattenResult(res);
       while (res.next_cursor) {
         console.log(`[LOG] Querying ${club.short}:${dbId} for more pages`);
         res = await queryDatabase(dbId, res.next_cursor);
-        pages.push(...flatten(res));
+        pages.push(...flattenResult(res));
       }
 
       // Remove existing cache and recreate dir (nanoid will invalidate old files)

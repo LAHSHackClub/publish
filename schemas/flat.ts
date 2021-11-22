@@ -1,10 +1,9 @@
 
 import { BaseObject } from './base.ts';
 
-export interface Database extends BaseObject {
+export interface Flattenable extends BaseObject {
   properties: { [key: string]: any }
 }
-
-export interface FlatDatabase extends BaseObject {
+export interface Flattened extends BaseObject {
   [key: string]: any
 }

@@ -1,13 +1,14 @@
 
 import { nanoid, Image } from '../deps.ts';
+import { Flattened } from "../schemas/mod.ts";
 
-export async function cachePages(dbId: string, pages: any[]): Promise<void> {
+export async function cachePages(dbId: string, pages: Flattened[]): Promise<void> {
   for (const page of pages)
     await cachePage(dbId, page);
 }
 
-async function cachePage(dbId: string, page: any): Promise<void> {
-  const keys = Object.keys(page).filter(key => page[key]?.type === 'files');
+async function cachePage(dbId: string, page: Flattened): Promise<void> {
+  const keys = Object.keys(page).filter(k => page[k]?.type === 'files');
   for (const key of keys) {
     for (const item of page[key]) {
       const fileId = nanoid();

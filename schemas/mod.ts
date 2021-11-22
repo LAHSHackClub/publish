@@ -1,4 +1,3 @@
 
-export * from './database.ts';
-export * from './page.ts';
+export * from './flat.ts';
 export * from './result.ts';
