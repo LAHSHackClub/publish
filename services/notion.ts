@@ -4,11 +4,15 @@ import { Database, PaginationResult, Page } from "../schemas/mod.ts";
 
 const baseUrl = 'https://api.notion.com/v1';
 const baseOpts = {
-  headers: { 'Authorization': `Bearer ${config.notion_token}`, 'Notion-Version': '2021-08-16' }
+  headers: {
+    'Authorization': `Bearer ${config.notion_token}`,
+    'Notion-Version': '2021-08-16',
+    'Content-Type': 'application/json'
+  }
 };
 
 export async function queryDatabase(dbId: string, cursor?: string): Promise<PaginationResult<Page>> {
-  const body = { start_cursor: cursor, page_size: 100 };
+  const body = { start_cursor: cursor ?? undefined };
   const res = await fetch(`${baseUrl}/databases/${dbId}/query`,
     { ...baseOpts, method: 'POST', body: JSON.stringify(body)});
   return res.json();

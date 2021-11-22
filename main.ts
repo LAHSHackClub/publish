@@ -46,11 +46,12 @@ router
       } catch (e) { console.log(`[LOG] Updating ${club.short}:${dbId}`); }
 
       // Query Notion database and flatten
-      const res = await queryDatabase(dbId);
+      let res = await queryDatabase(dbId);
       let pages: any[] = flatten(res);
-      while (res.has_more) {
-        const next = await queryDatabase(dbId, res.next_cursor);
-        pages = pages.concat(pages, flatten(next));
+      while (res.next_cursor) {
+        console.log(`[LOG] Querying ${club.short}:${dbId} for more pages`);
+        res = await queryDatabase(dbId, res.next_cursor);
+        pages.push(...flatten(res));
       }
 
       // Remove existing cache and recreate dir (nanoid will invalidate old files)
