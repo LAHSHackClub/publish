@@ -1,6 +1,6 @@
 
 import { clubs, Router } from '../deps.ts';
-import { cachePages, cacheText } from '../services/cache.ts';
+import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
 import { flattenResult } from '../services/flatten.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 
@@ -38,17 +38,16 @@ apiRouter
         pages.push(...flattenResult(res));
       }
 
-      // Remove existing cache and recreate dir (nanoid will invalidate old files)
-      await Deno.remove(`./app/content/${dbId}`, { recursive: true });
-      await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
-      await Deno.remove(`./app/icon/${dbId}`, { recursive: true });
-      await Deno.mkdir(`./app/icon/${dbId}`, { recursive: true });
+      // Delete and recreate cache dir (invalidate old files)
+      await refreshDir(`/content/${dbId}`);
+      await refreshDir(`/icon/${dbId}`);
+
       // Find properties with files and cache them
       await cachePages(dbId, pages);
 
       // Cache and save the flat response with updated URLs
-      await cacheText(`./app/meta/${dbId}.json`, JSON.stringify(db));
-      await cacheText(`./app/cache/${dbId}.json`, JSON.stringify(pages));
+      await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
+      await cacheText(`/cache/${dbId}.json`, JSON.stringify(pages));
     }
     
     console.log(`[EVT] Finished publishing ${club.short} at ${new Date().toUTCString()}`);

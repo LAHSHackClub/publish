@@ -2,13 +2,17 @@
 import { nanoid, Image } from '../deps.ts';
 import { Flattened } from "../schemas/mod.ts";
 
-/* Convenience aliases for Deno file write functions */
+/* Convenience aliases for Deno file functions */
 const root = `${Deno.cwd()}/app`;
 export async function cacheFile(path: string, data: Uint8Array): Promise<void> {
   return Deno.writeFile(`${root}/${path}`, data);
 }
 export async function cacheText(path: string, data: string): Promise<void> {
   return Deno.writeTextFile(`${root}/${path}`, data);
+}
+export async function refreshDir(dir: string): Promise<void> {
+  await Deno.remove(`${root}/${dir}`, { recursive: true });
+  await Deno.mkdir(`${root}/${dir}`, { recursive: true });
 }
 
 /* Caching service */
