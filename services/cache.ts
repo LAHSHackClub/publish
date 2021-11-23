@@ -25,26 +25,32 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
   const keys = Object.keys(page).filter(k => page[k]?.type === 'files');
   for (const key of keys) {
     for (const item of page[key]) {
-      const fileId = nanoid();
-      const fileName = `${fileId}${item.name}`;
-      try {
-        // Get file data
-        const f = await(await fetch(item.url)).arrayBuffer();
+      if (item.type !== 'file') continue;
 
-        // Create a smaller thumbnail
-        const img = await Image.decode(f);
-        img.resize(600, Image.RESIZE_AUTO).encodeJPEG()
-          .then(ico => cacheFile(`/icon/${dbId}/${fileId}.jpg`, ico));
-        item.icon = `https://db.lahs.club/icon/${dbId}/${fileId}.jpg`;
-        // Update item with new paths
-        item.url = `https://db.lahs.club/content/${dbId}/${fileName}`;
+      const fId = nanoid();
+      const fType = item.name.split('.').pop();
+      const fPath = `${dbId}/${fId}.${fType}`;
+      const f = await(await fetch(item.url)).arrayBuffer();
 
-        // Save locally
-        await cacheFile(`/content/${dbId}/${fileName}`, new Uint8Array(f));
-      }
-      catch (e) {
-        console.log(`[LOG] ${dbId}:${fileId} is not a supported image - skipping`);
-      }
+      // Update item with new data
+      item.id = fId;
+      item.url = `https://db.lahs.club/content/${fPath}`;
+
+      // Save locally
+      cacheFile(`/content/${fPath}`, new Uint8Array(f));
     }
   }
 }
+
+/*
+async function createThumbnails() {
+  Image.decode(f)
+    .then(i => i.resize(600, Image.RESIZE_AUTO).encodeJPEG())
+    .then(i => cacheFile(`/icon/${fPath}`, i))
+    .catch(e => {
+      console.log(`[LOG] ${dbId}:${fId} is not a supported image - skipping`);
+    })
+    .finally(() => {
+      item.icon = `https://db.lahs.club/icon/${fPath}.jpg`;
+    });
+}*/
