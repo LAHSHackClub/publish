@@ -1,8 +1,9 @@
 
 import { clubs, Router } from '../deps.ts';
-import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
+import { cachePages, cacheText, createThumbnails, refreshDir } from '../services/cache.ts';
 import { flattenDb, flattenResult } from '../services/flatten.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
+import { persistence } from '../services/persistence.ts';
 
 export const apiRouter = new Router();
 apiRouter
@@ -17,7 +18,7 @@ apiRouter
       ctx.response.body = { error: 'Club not found' };
       return;
     }
-    console.log(`[EVT] Publishing ${club.short} at ${new Date().toUTCString()}`);
+    persistence.startProcess(club.id, `Publishing ${club.short}`);
 
     for (const dbId of club.databases) {
       // Perform metadata check to see if DB needs to be updated
@@ -26,17 +27,17 @@ apiRouter
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
         if (db.last_edited_time !== metaDb.last_edited_time)
           throw new Error();
-        else console.log(`[LOG] ${club.short}:${dbId} is up to date`);
+        else persistence.log(club.id, `${club.short}:${dbId} is up to date`);
         continue;
       } catch (e) {
-        console.log(`[LOG] Updating ${club.short}:${dbId}`);
+        persistence.log(club.id, `Updating ${club.short}:${dbId}`);
       }
 
       // Query Notion database and flatten
       let res = await queryDatabase(dbId, undefined);
       let pages = flattenResult(res);
       while (res.next_cursor) {
-        console.log(`[LOG] Querying ${club.short}:${dbId} for more pages`);
+        persistence.log(club.id, `Querying ${club.short}:${dbId} for more pages`);
         res = await queryDatabase(dbId, res.next_cursor);
         pages.push(...flattenResult(res));
       }
@@ -51,8 +52,11 @@ apiRouter
       // Cache and save the flat response with updated URLs
       await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
       await cacheText(`/cache/${dbId}.json`, JSON.stringify(pages));
+
+      // Create thumbnails for images
+      await createThumbnails(club.id, dbId);
     }
     
-    console.log(`[EVT] Finished publishing ${club.short} at ${new Date().toUTCString()}`);
+    persistence.endProcess(club.id, `Publishing ${club.short}`);
     ctx.response.status = 204;
   });
