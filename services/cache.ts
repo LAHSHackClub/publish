@@ -1,6 +1,7 @@
 
 import { nanoid, Image } from '../deps.ts';
-import { Flattened } from "../schemas/mod.ts";
+import { persistence } from '../services/persistence.ts';
+import { Flattened } from '../schemas/mod.ts';
 
 /* Convenience aliases for Deno file functions */
 const root = `${Deno.cwd()}/app`;
@@ -35,6 +36,7 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
       // Update item with new data
       item.id = fId;
       item.url = `https://db.lahs.club/content/${fPath}`;
+      item.icon = `https://db.lahs.club/icon/${dbId}/${fId}.jpg`;
 
       // Save locally
       cacheFile(`/content/${fPath}`, new Uint8Array(f));
@@ -42,15 +44,31 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
   }
 }
 
-/*
-async function createThumbnails() {
-  Image.decode(f)
-    .then(i => i.resize(600, Image.RESIZE_AUTO).encodeJPEG())
-    .then(i => cacheFile(`/icon/${fPath}`, i))
-    .catch(e => {
-      console.log(`[LOG] ${dbId}:${fId} is not a supported image - skipping`);
-    })
-    .finally(() => {
-      item.icon = `https://db.lahs.club/icon/${fPath}.jpg`;
-    });
-}*/
+export async function createThumbnails(clubId: string, dbId: string): Promise<void> {
+  persistence.startProcess(clubId, `Creating thumbnails for ${dbId}`);
+  let start = new Date().getTime();
+  for await (const f of Deno.readDir(`${root}/content/${dbId}`)) {
+    if (!f.isFile) continue;
+    const fId = f.name.split('.').shift();
+    if (!fId) continue;
+    await createThumbnail(clubId, dbId, fId);
+    if (new Date().getTime() - start > 10000) {
+      persistence.log(clubId, `Creating thumbnails for ${dbId} still in progress`);
+      start = new Date().getTime();
+    }
+  }
+  persistence.endProcess(clubId, `Creating thumbnails for ${dbId}`);
+}
+
+async function createThumbnail(cId: string, dbId: string, fId: string) {
+  for await (const f of Deno.readDir(`${root}/content/${dbId}`)) {
+    if (!f.isFile) continue;
+    const fName = f.name.split('.').shift();
+    if (fName !== fId) continue;
+    await Image.decode(await Deno.readFile(`${root}/content/${dbId}/${f.name}`))
+      .then(i => i.resize(600, Image.RESIZE_AUTO).encodeJPEG())
+      .then(i => cacheFile(`/icon/${dbId}/${fId}.jpg`, i))
+      .catch(e => persistence.log(cId, `[LOG] ${dbId}:${fId} unsupported file type - skipping`));
+    return;
+  }
+}
