@@ -1,6 +1,6 @@
 
 import { clubs, Router } from '../deps.ts';
-import { cachePages, cacheText, createThumbnails, refreshDir } from '../services/cache.ts';
+import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
 import { flattenDb, flattenResult } from '../services/flatten.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 import { persistence } from '../services/persistence.ts';
@@ -52,9 +52,6 @@ apiRouter
       // Cache and save the flat response with updated URLs
       await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
       await cacheText(`/cache/${dbId}.json`, JSON.stringify(pages));
-
-      // Create thumbnails for images
-      await createThumbnails(club.id, dbId);
     }
     
     persistence.endProcess(club.id, `Publishing ${club.short}`);

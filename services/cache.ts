@@ -44,31 +44,14 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
   }
 }
 
-export async function createThumbnails(clubId: string, dbId: string): Promise<void> {
-  persistence.startProcess(clubId, `Creating thumbnails for ${dbId}`);
-  let start = new Date().getTime();
-  for await (const f of Deno.readDir(`${root}/content/${dbId}`)) {
-    if (!f.isFile) continue;
-    const fId = f.name.split('.').shift();
-    if (!fId) continue;
-    await createThumbnail(clubId, dbId, fId);
-    if (new Date().getTime() - start > 10000) {
-      persistence.log(clubId, `Creating thumbnails for ${dbId} still in progress`);
-      start = new Date().getTime();
-    }
-  }
-  persistence.endProcess(clubId, `Creating thumbnails for ${dbId}`);
-}
-
-async function createThumbnail(cId: string, dbId: string, fId: string) {
+export async function createThumbnail(dbId: string, fId: string) {
   for await (const f of Deno.readDir(`${root}/content/${dbId}`)) {
     if (!f.isFile) continue;
     const fName = f.name.split('.').shift();
     if (fName !== fId) continue;
     await Image.decode(await Deno.readFile(`${root}/content/${dbId}/${f.name}`))
       .then(i => i.resize(600, Image.RESIZE_AUTO).encodeJPEG())
-      .then(i => cacheFile(`/icon/${dbId}/${fId}.jpg`, i))
-      .catch(e => persistence.log(cId, `[LOG] ${dbId}:${fId} unsupported file type - skipping`));
+      .then(i => cacheFile(`/icon/${dbId}/${fId}.jpg`, i));
     return;
   }
 }
