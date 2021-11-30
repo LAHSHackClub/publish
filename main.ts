@@ -27,18 +27,6 @@ app.use(apiRouter.allowedMethods());
 app.use(async (ctx) => {
   ctx.response.headers.set('Access-Control-Allow-Origin', '*');
   try {
-    if (ctx.request.url.pathname.startsWith('/icon/')) {
-      if (!(await exists(`./app${ctx.request.url.pathname}`))) {
-        console.log("[LOG] Creating a thumbnail")
-        const segments = ctx.request.url.pathname.split('/');
-        if (!segments || segments === undefined)
-          throw new Error();
-        const fId = (segments.pop() ?? '').split('.').shift() || '';
-        const dbId = segments.pop() || '';
-        await createThumbnail(dbId, fId);
-      }
-    }
-
     await send(ctx, ctx.request.url.pathname, {
       root: `${Deno.cwd()}/app`,
       index: 'index.html',

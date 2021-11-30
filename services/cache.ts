@@ -1,6 +1,5 @@
 
-import { nanoid, Image } from '../deps.ts';
-import { persistence } from '../services/persistence.ts';
+import { nanoid } from '../deps.ts';
 import { Flattened } from '../schemas/mod.ts';
 
 /* Convenience aliases for Deno file functions */
@@ -36,22 +35,21 @@ async function cachePage(dbId: string, page: Flattened): Promise<void> {
       // Update item with new data
       item.id = fId;
       item.url = `https://db.lahs.club/content/${fPath}`;
-      item.icon = `https://db.lahs.club/icon/${dbId}/${fId}.jpg`;
+      item.icon = `https://db.lahs.club/icon/${dbId}/${fId}.webp`;
 
       // Save locally
-      cacheFile(`/content/${fPath}`, new Uint8Array(f));
+      await cacheFile(`/content/${fPath}`, new Uint8Array(f));
+      createThumbnail(dbId, fId, fType);
     }
   }
 }
 
-export async function createThumbnail(dbId: string, fId: string) {
-  for await (const f of Deno.readDir(`${root}/content/${dbId}`)) {
-    if (!f.isFile) continue;
-    const fName = f.name.split('.').shift();
-    if (fName !== fId) continue;
-    await Image.decode(await Deno.readFile(`${root}/content/${dbId}/${f.name}`))
-      .then(i => i.resize(600, Image.RESIZE_AUTO).encodeJPEG())
-      .then(i => cacheFile(`/icon/${dbId}/${fId}.jpg`, i));
-    return;
-  }
+export async function createThumbnail(dbId: string, fId: string, fType: string) {
+  const nodePath = './services/image/node.js';
+  Deno.run({
+    cmd: ['node', nodePath,
+      '-f', `${root}/content/${dbId}/${fId}.${fType}`,
+      '-o', `${root}/icon/${dbId}/${fId}.webp`
+    ]
+  });
 }
