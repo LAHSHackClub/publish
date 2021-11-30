@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "sharp": "^0.29.3",
+    "yargs": "^17.2.1"
+  }
+}
