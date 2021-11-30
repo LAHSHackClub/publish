@@ -16,6 +16,6 @@ if (args.file && args.output) {
   console.log(`File: ${args.file}`);
   console.log(`Out: ${args.output}`);
   sharp(fs.readFileSync(args.file))
-    .resize({ fit: 'contain', width: 600, height: 600})
+    .resize({ fit: 'contain', width: 600 })
     .toFile(`${args.output}`);
 }
