@@ -1,4 +1,3 @@
-
 export const clubs = [
   {
     id: "RsDUjjlJEr73Gl5DJPbFE",
@@ -9,6 +8,12 @@ export const clubs = [
       "23238e8d7e984544b511281ebac57fac", // Artist spotlight
       "c229212b24fa44a0baacc3cbb6804f92", // Active members
       "e7b1a8a9b0574274afc56ac73e513f32", // Activities archive
-    ]
-  }
-]
+    ],
+  },
+  {
+    id: "Fq5IxGYfPm_b1PM9YetD7",
+    name: "LAHS Plus club database",
+    short: "plus",
+    databases: ["85bf7ecf9efd4ce5b392a4a16b8d03b7"], // All Club database
+  },
+];
