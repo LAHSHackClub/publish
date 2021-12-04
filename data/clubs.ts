@@ -12,8 +12,10 @@ export const clubs = [
   },
   {
     id: "Fq5IxGYfPm_b1PM9YetD7",
-    name: "LAHS Plus club database",
+    name: "LAHS Plus",
     short: "plus",
-    databases: ["85bf7ecf9efd4ce5b392a4a16b8d03b7"], // All Club database
+    databases: [
+      "85bf7ecf9efd4ce5b392a4a16b8d03b7", // All Club database
+    ],
   },
 ];
