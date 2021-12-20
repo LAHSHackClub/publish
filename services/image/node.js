@@ -13,8 +13,7 @@ const args = yargs(process.argv.slice(2))
   .argv;
 
 if (args.file && args.output) {
-  console.log(`File: ${args.file}`);
-  console.log(`Out: ${args.output}`);
+  console.log(`Resizing ${args.file} | ${args.output}`);
   sharp(fs.readFileSync(args.file))
     .rotate()
     .resize({ fit: 'contain', width: 600 })
