@@ -1,6 +1,5 @@
 
 import { nanoid } from '../deps.ts';
-import { Flattened } from '../schemas/mod.ts';
 
 /* Convenience aliases for Deno file functions */
 const root = `${Deno.cwd()}/app`;
@@ -16,14 +15,16 @@ export async function refreshDir(dir: string): Promise<void> {
 }
 
 /* Caching service */
-export async function cachePages(dbId: string, pages: Flattened[]): Promise<void> {
+export async function cachePages(dbId: string, pages: any[]): Promise<void> {
   for (const page of pages)
     await cachePage(dbId, page);
 }
 
-async function cachePage(dbId: string, page: Flattened): Promise<void> {
-  const keys = Object.keys(page).filter(k => page[k]?.type === 'files');
+async function cachePage(dbId: string, page: any): Promise<void> {
+  const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
+  const keys = Object.keys(metaDb.properties).filter(p => metaDb.properties[p] === 'files');
   for (const key of keys) {
+    console.log(key);
     for (const item of page[key]) {
       if (item.type !== 'file') continue;
 

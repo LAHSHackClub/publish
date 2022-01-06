@@ -1,6 +1,5 @@
 
 import { config } from "../deps.ts";
-import { Flattenable, PaginationResult } from "../schemas/mod.ts";
 
 const baseUrl = 'https://api.notion.com/v1';
 const baseOpts = {
@@ -13,7 +12,7 @@ const baseOpts = {
 
 // Query database for pages and return a pagination result
 export async function queryDatabase(
-    dbId: string, cursor?: string, after?: Date): Promise<PaginationResult> {
+    dbId: string, cursor?: string, after?: Date): Promise<any> {
   // Database query options - pagination + filters
   const body = { start_cursor: cursor };
   // Make the query and return JSON response
@@ -23,7 +22,7 @@ export async function queryDatabase(
 }
 
 // Get database meta information from Notion
-export async function getDatabase(dbId: string): Promise<Flattenable> {
+export async function getDatabase(dbId: string): Promise<any> {
   const res = await fetch(`${baseUrl}/databases/${dbId}`, baseOpts);
   return res.json();
 }

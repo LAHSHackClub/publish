@@ -1,7 +1,7 @@
 
 import { clubs, Router } from '../deps.ts';
 import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
-import { flattenDb, flattenResult } from '../services/flatten.ts';
+import { flattenDatabase, flattenQuery } from '../deps.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 import { persistence } from '../services/persistence.ts';
 
@@ -22,7 +22,7 @@ apiRouter
 
     for (const dbId of club.databases) {
       // Perform metadata check to see if DB needs to be updated
-      const db = flattenDb(await getDatabase(dbId));
+      const db = flattenDatabase(await getDatabase(dbId));
       try {
         const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
         if (db.last_edited_time !== metaDb.last_edited_time)
@@ -33,13 +33,16 @@ apiRouter
         persistence.log(club.id, `Updating ${club.short}:${dbId}`);
       }
 
+      // Save meta information
+      await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
+
       // Query Notion database and flatten
       let res = await queryDatabase(dbId, undefined);
-      let pages = flattenResult(res);
+      let pages = flattenQuery(res);
       while (res.next_cursor) {
         persistence.log(club.id, `Querying ${club.short}:${dbId} for more pages`);
         res = await queryDatabase(dbId, res.next_cursor);
-        pages.push(...flattenResult(res));
+        pages.push(...flattenQuery(res));
       }
 
       // Delete and recreate cache dir (invalidate old files)
@@ -50,7 +53,6 @@ apiRouter
       await cachePages(dbId, pages);
 
       // Cache and save the flat response with updated URLs
-      await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
       await cacheText(`/cache/${dbId}.json`, JSON.stringify(pages));
     }
     
