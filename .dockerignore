@@ -3,3 +3,5 @@
 ./app/content/*
 ./app/icon/*
 ./app/meta/*
+
+/services/image/node_modules
