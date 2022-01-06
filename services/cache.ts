@@ -24,7 +24,6 @@ async function cachePage(dbId: string, page: any): Promise<void> {
   const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
   const keys = Object.keys(metaDb.properties).filter(p => metaDb.properties[p] === 'files');
   for (const key of keys) {
-    console.log(key);
     for (const item of page[key]) {
       if (item.type !== 'file') continue;
 
