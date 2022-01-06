@@ -2,12 +2,6 @@
 import { clubs, Application, send } from './deps.ts';
 import { apiRouter } from './routes/api.ts';
 
-import {
-  exists
-} from "https://deno.land/std@0.115.1/fs/mod.ts";
-
-import { createThumbnail } from './services/cache.ts';
-
 /* Startup - ensure needed directories exist */
 await Deno.mkdir(`./app/cache`, { recursive: true });
 await Deno.mkdir(`./app/meta`, { recursive: true });
