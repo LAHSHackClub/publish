@@ -1,5 +1,13 @@
 export const clubs = [
   {
+    id: "jKRFSCo4xMVwNIZp9syR7",
+    name: "LAHS Classes",
+    short: "classes",
+    databases: [
+      "9ef0d1b5876b479f97530f714f126c32" // department-art
+    ]
+  },
+  {
     id: "RsDUjjlJEr73Gl5DJPbFE",
     name: "National Art Honors Society",
     short: "nahs",
