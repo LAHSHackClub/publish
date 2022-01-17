@@ -4,6 +4,7 @@ export const clubs = [
     name: "LAHS Classes",
     short: "classes",
     databases: [
+      "517a8232b10d4bd9820e08bf52cfc64d", // department
       "6cdd550534224d4bab43b114d713eda6", // department-athletics
       "9ef0d1b5876b479f97530f714f126c32", // department-art
       "1cbfc877f4874cb1815846806321b843", // department-elective
