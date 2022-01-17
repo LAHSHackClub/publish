@@ -13,7 +13,9 @@ const args = yargs(process.argv.slice(2))
   .argv;
 
 if (args.file && args.output) {
-  console.log(`Resizing ${args.file} | ${args.output}`);
+  const inputFSplit = args.file.split('/');
+  const inputFileName = inputFSplit[inputFSplit.length - 1];
+  console.log(`Resizing ${inputFileName}`);
   sharp(fs.readFileSync(args.file))
     .rotate()
     .resize({ fit: 'contain', width: 600 })
