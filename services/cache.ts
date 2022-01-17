@@ -38,7 +38,7 @@ async function cachePage(dbId: string, page: any): Promise<void> {
       item.icon = `https://db.lahs.club/icon/${dbId}/${fId}.webp`;
 
       // Save locally
-      await cacheFile(`/content/${fPath}`, new Uint8Array(f));
+      await cacheFile(`content/${fPath}`, new Uint8Array(f));
       createThumbnail(dbId, fId, fType);
     }
   }
