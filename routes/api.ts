@@ -21,11 +21,21 @@ apiRouter
     persistence.startProcess(club.id, `Publishing ${club.short}`);
 
     for (const dbId of club.databases) {
-      // Perform metadata check to see if DB needs to be updated
+      // Query Notion database and flatten
+      let res = await queryDatabase(dbId, undefined);
+      let pages = flattenQuery(res);
+      while (res.next_cursor) {
+        persistence.log(club.id, `Querying ${club.short}:${dbId} for more pages`);
+        res = await queryDatabase(dbId, res.next_cursor);
+        pages.push(...flattenQuery(res));
+      }
+
+      // Perform data check to see if DB needs to be updated
       const db = flattenDatabase(await getDatabase(dbId));
       try {
-        const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
-        if (db.last_edited_time !== metaDb.last_edited_time)
+        const cached = JSON.parse(await Deno.readTextFile(`./app/cache/${dbId}.json`));
+        if (cached.length !== pages.length ||
+            cached.forEach((p: any) => !pages.find(p2 => p2.id === p.id)))
           throw new Error();
         else persistence.log(club.id, `${club.short}:${dbId} is up to date`);
         continue;
@@ -35,15 +45,6 @@ apiRouter
 
       // Save meta information
       await cacheText(`/meta/${dbId}.json`, JSON.stringify(db));
-
-      // Query Notion database and flatten
-      let res = await queryDatabase(dbId, undefined);
-      let pages = flattenQuery(res);
-      while (res.next_cursor) {
-        persistence.log(club.id, `Querying ${club.short}:${dbId} for more pages`);
-        res = await queryDatabase(dbId, res.next_cursor);
-        pages.push(...flattenQuery(res));
-      }
 
       // Delete and recreate cache dir (invalidate old files)
       await refreshDir(`/content/${dbId}`);
