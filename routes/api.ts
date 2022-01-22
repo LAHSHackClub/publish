@@ -33,10 +33,14 @@ apiRouter
       // Perform data check to see if DB needs to be updated
       const db = flattenDatabase(await getDatabase(dbId));
       try {
-        const cached = JSON.parse(await Deno.readTextFile(`./app/cache/${dbId}.json`));
-        if (cached.length !== pages.length ||
-            cached.forEach((p: any) => !pages.find(p2 => p2.id === p.id)))
+        const cached: any[] = JSON.parse(await Deno.readTextFile(`./app/cache/${dbId}.json`));
+        const meta = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
+
+        if (meta.last_updated !== db.last_updated ||
+            cached.length !== pages.length ||
+            JSON.stringify(cached.map(p => p.last_edited_time)) !== JSON.stringify(pages.map(p => p.last_edited_time)))
           throw new Error();
+
         else persistence.log(club.id, `${club.short}:${dbId} is up to date`);
         continue;
       } catch (e) {
