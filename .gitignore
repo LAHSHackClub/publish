@@ -3,6 +3,7 @@
 .vscode/*
 
 # environments
+.env
 /environment/environment.dev.ts
 
 # app

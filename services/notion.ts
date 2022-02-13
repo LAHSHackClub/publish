@@ -1,10 +1,8 @@
 
-import { config } from "../deps.ts";
-
 const baseUrl = 'https://api.notion.com/v1';
 const baseOpts = {
   headers: {
-    'Authorization': `Bearer ${config.notion_token}`,
+    'Authorization': `Bearer ${Deno.env.get("NOTION_TOKEN") || ""}`,
     'Notion-Version': '2021-08-16',
     'Content-Type': 'application/json'
   }
