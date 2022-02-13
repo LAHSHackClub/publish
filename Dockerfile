@@ -18,6 +18,8 @@ WORKDIR /app
 COPY deps.ts .
 COPY . .
 
+ENV NOTION_TOKEN=${NOTION_TOKEN}
+
 RUN deno cache deps.ts
 RUN deno cache main.ts
 
