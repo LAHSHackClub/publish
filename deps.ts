@@ -1,5 +1,5 @@
 
-import "https://deno.land/x/dotenv@v3.1.0/load.ts";
+import "https://deno.land/x/dotenv@v3.2.0/load.ts";
 export { clubs } from './data/clubs.ts';
 
 export { nanoid } from 'https://deno.land/x/nanoid@v3.0.0/mod.ts';

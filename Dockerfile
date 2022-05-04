@@ -1,5 +1,5 @@
 
-FROM denoland/deno:ubuntu-1.15.3
+FROM denoland/deno:ubuntu-1.21.1
 
 ENV NODE_VERSION=16.13.0
 RUN apt update
@@ -17,8 +17,6 @@ WORKDIR /app
 
 COPY deps.ts .
 COPY . .
-
-ENV NOTION_TOKEN=${NOTION_TOKEN}
 
 RUN deno cache deps.ts
 RUN deno cache main.ts
