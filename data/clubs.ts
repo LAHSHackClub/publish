@@ -22,7 +22,9 @@ export const clubs = [
     name: "National Art Honors Society",
     short: "nahs",
     databases: [
-      "814bc6c60d0a4e13bc3f8bf33c8a3117", // Art show
+      "761269d6997543f5a1b86c0bd17e9ef3", // Art show settings
+      "814bc6c60d0a4e13bc3f8bf33c8a3117", // Art show 2021F
+      "668715be0b444d8082d75951ad8a1e38", // Art show 2022F
       "23238e8d7e984544b511281ebac57fac", // Artist spotlight
       "c229212b24fa44a0baacc3cbb6804f92", // Active members
       "e7b1a8a9b0574274afc56ac73e513f32", // Activities archive
