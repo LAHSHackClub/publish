@@ -11,6 +11,7 @@
 /app/cache/*
 /app/icon/*
 /app/meta/*
+/app/view/*
 
 # node service
 /services/image/node_modules/*

@@ -1,6 +1,6 @@
 
 import { clubs, Router } from '../deps.ts';
-import { cachePages, cacheText, refreshDir } from '../services/cache.ts';
+import { cachePages, cacheText, processCache, refreshDir } from '../services/cache.ts';
 import { flattenDatabase, flattenQuery } from '../deps.ts';
 import { getDatabase, queryDatabase } from '../services/notion.ts';
 import { persistence } from '../services/persistence.ts';
@@ -59,6 +59,10 @@ apiRouter
 
       // Cache and save the flat response with updated URLs
       await cacheText(`/cache/${dbId}.json`, JSON.stringify(pages));
+
+      // Generates thumbnails, view img
+      const cache: any[] = JSON.parse(await Deno.readTextFile(`./app/cache/${dbId}.json`));
+      await processCache(dbId, cache);
     }
     
     persistence.endProcess(club.id, `Publishing ${club.short}`);
