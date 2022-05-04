@@ -34,8 +34,8 @@ async function cachePage(dbId: string, page: any): Promise<void> {
 
       // Update item with new data
       item.id = fId;
-      item.url = `https://db.lahs.club/content/${fPath}`;
       item.icon = `https://db.lahs.club/icon/${dbId}/${fId}.webp`;
+      item.url = `https://db.lahs.club/view/${dbId}/${fId}.webp`;
 
       // Save locally
       await cacheFile(`content/${fPath}`, new Uint8Array(f));
@@ -46,10 +46,20 @@ async function cachePage(dbId: string, page: any): Promise<void> {
 
 export async function createThumbnail(dbId: string, fId: string, fType: string) {
   const nodePath = './services/image/node.js';
+  // Creates 600px thumbnail
   Deno.run({
     cmd: ['node', nodePath,
       '-f', `${root}/content/${dbId}/${fId}.${fType}`,
-      '-o', `${root}/icon/${dbId}/${fId}.webp`
+      '-o', `${root}/icon/${dbId}/${fId}.webp`,
+      '-w', '600',
     ]
   });
+  // Creates 4K view image
+  Deno.run({
+    cmd: ['node', nodePath,
+      '-f', `${root}/content/${dbId}/${fId}.${fType}`,
+      '-o', `${root}/view/${dbId}/${fId}.webp`,
+      '-w', '3840',
+    ]
+  })
 }

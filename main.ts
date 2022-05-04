@@ -9,6 +9,7 @@ clubs.forEach(async club => {
   club.databases.forEach(async (dbId: string) => {
     await Deno.mkdir(`./app/content/${dbId}`, { recursive: true });
     await Deno.mkdir(`./app/icon/${dbId}`, { recursive: true });
+    await Deno.mkdir(`./app/view/${dbId}`, { recursive: true });
   });});
 console.log(`[EVT] Completed setup at ${new Date().toUTCString()}`);
 

@@ -10,6 +10,9 @@ const args = yargs(process.argv.slice(2))
   .option('output', {
     alias: 'o'
   })
+  .option('width', {
+    alias: 'w'
+  })
   .argv;
 
 if (args.file && args.output) {
@@ -18,6 +21,6 @@ if (args.file && args.output) {
   console.log(`Resizing ${inputFileName}`);
   sharp(fs.readFileSync(args.file))
     .rotate()
-    .resize({ fit: 'contain', width: 600 })
+    .resize({ fit: 'contain', width: args.width })
     .toFile(`${args.output}`);
 }
