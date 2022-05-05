@@ -46,9 +46,9 @@ async function cachePage(dbId: string, page: any, keys: string[]): Promise<void>
 }
 
 export async function processCache(dbId: string, pages: any[]) {
+  const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
+  const keys = Object.keys(metaDb.properties).filter(p => metaDb.properties[p] === 'files');
   for (const page of pages) {
-    const metaDb = JSON.parse(await Deno.readTextFile(`./app/meta/${dbId}.json`));
-    const keys = Object.keys(metaDb.properties).filter(p => metaDb.properties[p] === 'files');
     for (const key of keys) {
       for (const item of page[key]) {
         if (!item || item.type !== 'file') continue;
@@ -62,26 +62,26 @@ export async function processCache(dbId: string, pages: any[]) {
   }
 }
 
-export async function createThumbnail(dbId: string, fId: string, fType: string) {
+async function createThumbnail(dbId: string, fId: string, fType: string) {
   const nodePath = './services/image/node.js';
   // Creates 600px thumbnail
-  Deno.run({
+  await Deno.run({
     cmd: ['node', nodePath,
       '-f', `${root}/content/${dbId}/${fId}.${fType}`,
       '-o', `${root}/icon/${dbId}/${fId}.webp`,
       '-w', '600',
     ]
-  });
+  }).status();
 }
 
-export async function createView(dbId: string, fId: string, fType: string) {
+async function createView(dbId: string, fId: string, fType: string) {
   const nodePath = './services/image/node.js';
   // Creates 4K view image
-  Deno.run({
+  await Deno.run({
     cmd: ['node', nodePath,
       '-f', `${root}/content/${dbId}/${fId}.${fType}`,
       '-o', `${root}/view/${dbId}/${fId}.webp`,
       '-w', '3840',
     ]
-  })
+  }).status();
 }
