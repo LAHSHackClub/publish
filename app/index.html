@@ -26,6 +26,7 @@
         background: none;
         border: 4px solid orange;
         border-radius: 10px;
+        cursor: pointer;
         margin: 10px 0;
         padding: 16px 50px;
         font-family: inherit;
@@ -39,46 +40,75 @@
       button[disabled]:hover {
         border-color: red;
       }
-      h1 {
+      h1, h2 {
         font-size: 1.5rem;
         margin: 0;
       }
       p {
         margin: 0;
       }
-    </style>
-    <script>
-      let club;
-      let lastPublish;
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const clubId = new URLSearchParams(window.location.search).get("club");
-          if (!clubId) throw new Error("No club ID provided");
-          club = await (await fetch(`/club/${clubId}`)).json();
+      em {
+        font-size: 0.75rem;
+      }
+      .log {
+        white-space: pre-wrap;
+      }
 
-          document.querySelector("#club").innerHTML = club.name;
-          document.querySelector("#status").href = `https://${club.short}.lahs.club`;
-          document.querySelector("#status").innerHTML = `${club.short}.lahs.club`;
-          document.querySelector("#publish").removeAttribute("disabled");
+      .ov-log {
+        background-color: #fed;
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
+        transition-duration: 0.3s;
+
+        padding: 5px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      .ov-log.shown {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        margin: 20px;
+        transform: scale(0.8);
+      }
+      .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #234;
+        border-color: #234 transparent #234 transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+      }
+      @keyframes lds-dual-ring {
+        0% {
+          transform: rotate(0deg);
         }
-        catch (e) {
-          console.error(e);
-        }
-      });
-      async function publish() {
-        try {
-          const res = await fetch(`/club/${club.id}`, { method: "POST" });
-          document.querySelector("#status").innerHTML = new Date().toLocaleString();
-        }
-        catch (e) {
-          document.querySelector("#status").innerHTML = "error "+e;
-          console.error(e);
+        100% {
+          transform: rotate(360deg);
         }
       }
-    </script>
+    </style>
+    <script src="/script.js"></script>
   </head>
   <body>
     <main>
+      <div class="ov-log">
+        <p><em>Publishing may take up to 20 minutes. Please be patient!!</em></p>
+        <div class="lds-dual-ring"></div>
+        <p id="log"></p>
+      </div>
       <div>
         <h1><span id="club"><code>error</code></span></h1>
         <p>published <a id="status" target="_blank"></a></p>

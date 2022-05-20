@@ -2,7 +2,7 @@
 const baseUrl = 'https://api.notion.com/v1';
 const baseOpts = {
   headers: {
-    'Authorization': `Bearer ${Deno.env.get("NOTION_TOKEN") || ""}`,
+    'Authorization': `Bearer secret_jarb8inoeNyDvEqnhvECMrjEp9Xb9H3DaOjV68UQrVf`,
     'Notion-Version': '2021-08-16',
     'Content-Type': 'application/json'
   }

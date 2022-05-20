@@ -1,6 +1,7 @@
 
 import { clubs, Application, send } from './deps.ts';
 import { apiRouter } from './routes/api.ts';
+import { logRouter } from "./routes/log.ts";
 
 /* Startup - ensure needed directories exist */
 await Deno.mkdir(`./app/cache`, { recursive: true });
@@ -17,6 +18,8 @@ console.log(`[EVT] Completed setup at ${new Date().toUTCString()}`);
 const app = new Application();
 app.use(apiRouter.routes());
 app.use(apiRouter.allowedMethods());
+app.use(logRouter.routes());
+app.use(logRouter.allowedMethods());
 
 /* Static file serving (publish widget + usercontent) */
 app.use(async (ctx) => {
