@@ -4,6 +4,7 @@ async function getPeristLog() {
     .catch(e => document.querySelector("#log").innerHTML += "<br /> error! (network issue?) "+e);
   const json = await res.json();
   document.querySelector("#log").innerHTML = json._log.join("<br />");
+  document.querySelector(".ov-log").scrollBy(0, 1000);
 }
 
 let club;
