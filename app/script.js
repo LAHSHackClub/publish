@@ -1,6 +1,7 @@
 
 async function getPeristLog() {
-  const res = await fetch(`/log/${club.id}`);
+  const res = await fetch(`/log/${club.id}`)
+    .catch(e => document.querySelector("#log").innerHTML += "<br /> error! (network issue?) "+e);
   const json = await res.json();
   document.querySelector("#log").innerHTML = json._log.join("<br />");
 }
