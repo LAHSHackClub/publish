@@ -29,7 +29,9 @@ async function publish() {
     fetch(`/club/${club.id}`, { method: "POST" });
 
     document.querySelector(".ov-log").classList.add("shown");
-    setInterval(getPeristLog, 3000);
+    setTimeout(() => {
+      setInterval(getPeristLog, 3000);
+    }, 2000);
   }
   catch (e) {
     document.querySelector("#log").innerHTML = "error "+e;
