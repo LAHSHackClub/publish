@@ -21,6 +21,9 @@ export const clubs = [
     id: "RsDUjjlJEr73Gl5DJPbFE",
     name: "National Art Honors Society",
     short: "nahs",
+    dynamicDatabases: [
+      "761269d6997543f5a1b86c0bd17e9ef3" // Art show settings
+    ],
     databases: [
       "761269d6997543f5a1b86c0bd17e9ef3", // Art show settings
       "814bc6c60d0a4e13bc3f8bf33c8a3117", // Art show 2021F
