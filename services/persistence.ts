@@ -28,7 +28,7 @@ class PersistenceManager {
 	endProcess(clubId: string, process: string) {
 		const ls = `[EVT] ${this.getClub(clubId).short} - Process end: ${process}`;
 		console.log(ls);
-		delete this.processes[this.processes.findIndex(p => p._name === clubId)];
+		this.processes.splice(this.processes.findIndex(p => p._name === clubId), 1);
 	}
 }
 
